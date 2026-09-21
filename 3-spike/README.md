@@ -41,26 +41,3 @@ Na pasta `3-spike`, execute:
 
 ```bash
 python3 exemplo.py
-```
-
-Não é necessário instalar bibliotecas externas.
-
-## Resultado esperado
-
-A execução determinística está registrada em:
-
-```text
-saida-esperada.txt
-```
-
-Os IDs dos eventos são fixos (`evt-001`, `evt-002` e `evt-003`) para que a saída seja reproduzível e possa ser conferida.
-
-Ao final, o servidor possui **3 registros** e a fila local possui **0 eventos pendentes**.
-
-## Referência
-
-O mecanismo de reentrega e consumidor idempotente foi adaptado ao caso da Rede Municipal de Saúde a partir do conceito apresentado no livro:
-
-**Abreu, Douglas Henrique Siqueira. _Estilos Arquiteturais de Software: guia de consulta_. 2026.**
-
-O spike foi adaptado ao **Caso Saúde + Envelope A**, em vez de reproduzir um exemplo genérico do livro.
