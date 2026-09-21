@@ -4,12 +4,12 @@
 
 **Contexto:** As UBSs possuem internet extremamente instável, com quedas diárias. O atendimento e a triagem não podem parar, e os dados locais precisam sincronizar com o servidor central sem perder nem duplicar registros quando a rede voltar.
 
-**Decisão:** Implementar uma estratégia de Mensageria Assíncrona Local baseada em Fila (Event-Driven / Worker local). A aplicação na UBS mantém um banco de dados local (ex: SQLite embarcado) operando offline de forma transparente. Um worker em segundo plano monitora a conectividade e utiliza filas com retransmissão independente para enviar os eventos ao servidor central assim que a conexão é restabelecida.
+**Decisão:** Implementar uma estratégia de Mensageria Assíncrona Local baseada em Fila (Event-Driven / Worker local). A aplicação na UBS mantém um banco de dados local (ex: SQLite embarcado) operando offline de forma transparente. Um worker em segundo plano monitora a conectividade e utiliza filas com retransmissão independente para enviar os eventos ao servidor central assim que a conexão é restabelecida. Cada evento terá um identificador único e o processamento no servidor será idempotente, permitindo reprocessamento seguro sem criar registros duplicados.
 
 **Alternativas consideradas:**
 - Sistema estritamente online: descartado, inviabilizaria o uso nas UBSs devido às quedas de internet.
 - Replicação bidirecional de banco de dados corporativo: descartada pela complexidade de resolução de conflitos de concorrência em tempo real para 6 desenvolvedores.
 
 **Consequências:**
-- **Positivas:** garante autonomia operacional total para as UBSs mesmo durante blecautes de internet.
+- **Positivas:** garante autonomia operacional para as UBSs mesmo durante falhas de internet e permite retransmissão segura dos eventos.
 - **Negativas:** introduz a complexidade de consistência eventual e tratamento de conflitos de sincronização na camada de código.
