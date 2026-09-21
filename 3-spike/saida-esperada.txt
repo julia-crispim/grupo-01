@@ -1,1 +1,59 @@
+=== INÍCIO DA PROVA DE CONCEITO: SINCRONIZAÇÃO UBS ===
+[UBS - APP] Atendimento de 'Maria Clara' registrado LOCALMENTE com sucesso.
 
+--- INICIANDO WORKER DE SINCRONIZAÇÃO ---
+[UBS - WORKER] Tentando enviar paciente Maria Clara (ID: evt-001)
+[SERVIDOR] Recebendo requisição do evento evt-001...
+  -> [SUCESSO] Prontuário de Maria Clara salvo no banco central.
+[UBS - WORKER] Evento evt-001 removido da fila local.
+-----------------------------------------
+
+>>> SIMULANDO QUEDA DE INTERNET NA UBS <<<
+[UBS - APP] Atendimento de 'João Silva' registrado LOCALMENTE com sucesso.
+[UBS - APP] Atendimento de 'Ana Souza' registrado LOCALMENTE com sucesso.
+
+--- INICIANDO WORKER DE SINCRONIZAÇÃO ---
+[UBS - WORKER] Tentando enviar paciente João Silva (ID: evt-002)
+[REDE] Falha de conexão. Servidor inatingível.
+[UBS - WORKER] Falha ao enviar evt-002. Ficará na fila para retentativa.
+[UBS - WORKER] Tentando enviar paciente Ana Souza (ID: evt-003)
+[REDE] Falha de conexão. Servidor inatingível.
+[UBS - WORKER] Falha ao enviar evt-003. Ficará na fila para retentativa.
+-----------------------------------------
+
+>>> INTERNET VOLTA, MAS MUITO INSTÁVEL (TIMEOUT DE REDE) <<<
+
+--- INICIANDO WORKER DE SINCRONIZAÇÃO ---
+[UBS - WORKER] Tentando enviar paciente João Silva (ID: evt-002)
+[SERVIDOR] Recebendo requisição do evento evt-002...
+  -> [SUCESSO] Prontuário de João Silva salvo no banco central.
+[REDE] Conexão caiu durante a resposta (Timeout). A UBS achará que falhou.
+[UBS - WORKER] Falha ao enviar evt-002. Ficará na fila para retentativa.
+[UBS - WORKER] Tentando enviar paciente Ana Souza (ID: evt-003)
+[SERVIDOR] Recebendo requisição do evento evt-003...
+  -> [SUCESSO] Prontuário de Ana Souza salvo no banco central.
+[REDE] Conexão caiu durante a resposta (Timeout). A UBS achará que falhou.
+[UBS - WORKER] Falha ao enviar evt-003. Ficará na fila para retentativa.
+-----------------------------------------
+
+>>> INTERNET ESTABILIZADA. WORKER RETENTA ENVIO <<<
+
+--- INICIANDO WORKER DE SINCRONIZAÇÃO ---
+[UBS - WORKER] Tentando enviar paciente João Silva (ID: evt-002)
+[SERVIDOR] Recebendo requisição do evento evt-002...
+  -> [ALERTA] Duplicata detectada para evt-002. Ignorando para evitar duplo registro.
+[UBS - WORKER] Evento evt-002 removido da fila local.
+[UBS - WORKER] Tentando enviar paciente Ana Souza (ID: evt-003)
+[SERVIDOR] Recebendo requisição do evento evt-003...
+  -> [ALERTA] Duplicata detectada para evt-003. Ignorando para evitar duplo registro.
+[UBS - WORKER] Evento evt-003 removido da fila local.
+-----------------------------------------
+
+=== ESTADO FINAL DO BANCO CENTRAL ===
+Prontuário Registrado: Maria Clara - Suspeita de Dengue
+Prontuário Registrado: João Silva - Hipertensão
+Prontuário Registrado: Ana Souza - Renovação de Receita
+
+Total de eventos pendentes na fila da UBS: 0
+Total de registros no Servidor Central: 3
+======================================================
