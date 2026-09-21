@@ -1,1 +1,9 @@
+# Mapa de Restrições e Decisões
 
+| Restrição (Envelope) / Requisito (Caso) | Decisão Arquitetural Adotada | Justificativa / Como a Decisão Atende ao Ponto |
+|---|---|---|
+| Envelope A: Equipe pequena (apenas 6 desenvolvedores) e totalmente sem equipe de operações/DevOps dedicada. | Monolito Modular (Núcleo da Aplicação) | Elimina a sobrecarga operacional de gerenciar infraestrutura distribuída (microsserviços). Garante produtividade com um único deploy, mas mantém o código organizado por domínios. |
+| Envelope A + Caso: Orçamento apertado para 6 meses em nuvem pública (paga por uso) + Necessidade de suportar picos de campanhas de vacinação. | Arquitetura Serverless (AWS Lambda / Cloud Functions) | Escala automaticamente nos picos da vacinação sem derrubar o sistema e custa zero (scale-to-zero) quando não está em uso, protegendo o orçamento da startup. |
+| Caso: Obrigatoriedade de integrar e conviver com o sistema legado instável da Central de Regulação de Leitos. | Arquitetura Hexagonal (Portas e Adaptadores / Camada Anticorrupção) | Cria uma blindagem ao redor do núcleo. Se o legado governamental cair, mudar de contrato ou ficar lento, a regra de negócio do município continua intacta e isolada. |
+| Caso: Quedas de internet constantes nas UBSs, porém o atendimento médico não pode parar de forma alguma. | Padrão Orientado a Eventos (Message Broker) + PWA | O app (PWA) funciona offline. Quando a internet volta, as filas de mensagens (RabbitMQ/SQS) garantem que os dados do atendimento cheguem ao servidor central de forma assíncrona e resiliente. |
+| Caso: Exigência legal de manter os prontuários dos pacientes salvos de forma íntegra e segura por 20 anos. | Banco de Dados Relacional (PostgreSQL) | Garante consistência transacional forte (ACID) para não misturar remédios ou prontuários, oferecendo uma tecnologia madura e estável para retenção segura de dados em longo prazo. |
